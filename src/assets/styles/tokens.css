@@ -1,0 +1,132 @@
+/* 브랜드 컬러 변수 */
+:root {
+  --color-primary: #0066ff;
+  --color-primary-dark: #0047b3;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+  --color-gray-50: #f9fafb;
+  --color-gray-900: #111827;
+}
+
+/*
+ * iPhone 14 Pro Max typography scale
+ *
+ * The UI was originally tuned for the 375px-wide iPhone SE. On the new
+ * 430px canvas, type felt comparatively small, so the mobile type ramp is
+ * increased by roughly the same ratio as the viewport (about 14%). Keeping
+ * this in one place also covers the arbitrary pixel utilities used by cards,
+ * badges, charts, and modals without changing tablet/desktop typography.
+ */
+@media (min-width: 400px) and (max-width: 480px) {
+  body {
+    font-size: 18px;
+  }
+
+  .text-xs {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .text-sm {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .text-base {
+    font-size: 18px !important;
+    line-height: 26px !important;
+  }
+
+  .text-lg {
+    font-size: 20px !important;
+    line-height: 28px !important;
+  }
+
+  .text-xl {
+    font-size: 23px !important;
+    line-height: 30px !important;
+  }
+
+  .text-2xl {
+    font-size: 28px !important;
+    line-height: 36px !important;
+  }
+
+  .text-3xl {
+    font-size: 34px !important;
+    line-height: 42px !important;
+  }
+
+  .text-4xl {
+    font-size: 41px !important;
+    line-height: 48px !important;
+  }
+
+  .text-5xl {
+    font-size: 55px !important;
+    line-height: 60px !important;
+  }
+
+  [class~='text-[9px]'] {
+    font-size: 10px !important;
+  }
+
+  [class~='text-[10px]'],
+  [class~='text-[10.5px]'] {
+    font-size: 12px !important;
+  }
+
+  [class~='text-[11px]'],
+  [class~='text-[11.5px]'] {
+    font-size: 13px !important;
+  }
+
+  [class~='text-[12px]'] {
+    font-size: 14px !important;
+  }
+
+  [class~='text-[13px]'] {
+    font-size: 15px !important;
+  }
+
+  [class~='text-[15px]'] {
+    font-size: 17px !important;
+  }
+
+  [class~='text-[17px]'] {
+    font-size: 19px !important;
+  }
+
+  [class~='text-[22px]'] {
+    font-size: 25px !important;
+  }
+
+  [class~='text-[26px]'] {
+    font-size: 30px !important;
+  }
+
+  [class~='text-[28px]'] {
+    font-size: 32px !important;
+  }
+
+  [class~='text-[30px]'] {
+    font-size: 34px !important;
+  }
+
+  [class~='text-[32px]'] {
+    font-size: 37px !important;
+  }
+
+  [class~='text-[34px]'] {
+    font-size: 39px !important;
+  }
+
+  [class~='text-[36px]'] {
+    font-size: 41px !important;
+  }
+
+  [class~='text-[44px]'] {
+    font-size: 50px !important;
+  }
+}
