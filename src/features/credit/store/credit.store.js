@@ -16,7 +16,7 @@ export const useCreditStore = defineStore('credit', {
       try {
         const [scoreData, historyPage] = await Promise.all([
           getCreditScore(),
-          getCreditScoreHistory({ page: 1, size: 20 }),
+          getCreditScoreHistory({ page: 1, size: 50 }), // 최근 6개월 이력을 다 담을 수 있도록 size 확장
         ])
 
         this.currentScore = scoreData.currentScore

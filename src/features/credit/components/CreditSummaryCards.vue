@@ -22,11 +22,11 @@
       </div>
     </div>
 
-    <!-- 카드 2: 이번 달 점수 변동 -->
+    <!-- 카드 2: 최근 6개월 점수 변동 -->
     <div
       class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between h-[140px]"
     >
-      <span class="text-sm font-medium text-gray-500">이번 달 점수 변동</span>
+      <span class="text-sm font-medium text-gray-500">최근 6개월 점수 변동</span>
       <div>
         <div class="flex items-baseline gap-1">
           <span
@@ -50,6 +50,7 @@
             점
           </span>
         </div>
+        <!-- 예: "2026.03.01 이후 변동 합계" 출력 -->
         <p class="text-xs text-gray-400 mt-1">{{ scoreChangeDescription }}</p>
       </div>
     </div>

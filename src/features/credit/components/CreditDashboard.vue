@@ -156,15 +156,21 @@
         <div
           v-for="item in positiveItems"
           :key="item.id"
-          class="p-4 sm:p-5 border border-blue-100 rounded-2xl bg-blue-50/50 hover:border-blue-200 transition-all duration-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
+          class="p-4 sm:p-5 border border-blue-300 rounded-2xl bg-blue-100/30 hover:border-blue-200 transition-all duration-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
         >
-          <div class="space-y-1 flex-1">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-bold text-slate-900 text-sm sm:text-base">{{ item.name }}</span>
-
-              <!-- 가점 점수 뱃지 (파란색) -->
+          <div class="space-y-2.5 flex-1 min-w-0">
+            <div class="flex justify-between items-center flex-wrap gap-2">
               <span
-                class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-md shrink-0"
+                class="font-bold text-blue-950 text-sm sm:text-base flex items-center gap-2 min-w-0"
+              >
+                <!-- 가점 파란색 점 -->
+                <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+                {{ item.name }}
+              </span>
+
+              <!-- 가점 점수 뱃지 -->
+              <span
+                class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-md shrink-0 ml-auto"
               >
                 {{ item.actionText }}
               </span>
@@ -175,9 +181,9 @@
             </p>
           </div>
 
-          <!-- 평가 반영 비중 영역 (2줄 배치) -->
+          <!-- 평가 반영 비중 영역 -->
           <div
-            class="border-t md:border-t-0 pt-2.5 md:pt-0 border-blue-100 shrink-0 text-left md:text-right"
+            class="border-t md:border-t-0 pt-3 md:pt-0 border-blue-100 shrink-0 text-left md:text-right"
           >
             <div class="text-[11px] sm:text-xs text-slate-400 mb-0.5">평가 반영 비중</div>
 
@@ -194,18 +200,22 @@
         <div
           v-for="item in negativeItems"
           :key="item.id"
-          class="p-4 sm:p-5 border border-rose-100 bg-rose-50/20 rounded-2xl space-y-2.5 transition-all duration-200"
+          class="p-4 sm:p-5 border border-rose-300 bg-rose-100/30 rounded-2xl space-y-2.5 transition-all duration-200"
         >
-          <div class="flex justify-between items-center flex-wrap gap-2">
-            <span class="font-bold text-rose-950 text-sm sm:text-base flex items-center gap-2">
+          <div class="flex justify-between items-center gap-2">
+            <span
+              class="font-bold text-rose-950 text-sm sm:text-base flex items-center gap-2 min-w-0"
+            >
+              <!-- 감점 빨간색 점 -->
               <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
-              {{ item.name }}
+
+              <span class="truncate">{{ item.name }}</span>
             </span>
 
-            <!-- 감점 점수 뱃지 (빨간색) -->
+            <!-- 모바일에서도 오른쪽 끝 -->
             <span
               v-if="item.actionText"
-              class="text-xs font-bold text-rose-600 bg-rose-100/80 border border-rose-200 px-2.5 py-0.5 rounded-md"
+              class="text-xs font-bold text-rose-600 bg-rose-100/80 border border-rose-200 px-2.5 py-0.5 rounded-md shrink-0 ml-auto"
             >
               {{ item.actionText }}
             </span>
