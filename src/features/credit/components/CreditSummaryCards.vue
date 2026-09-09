@@ -62,7 +62,7 @@
       <!-- 헤더 & 페이스 상태 -->
       <div class="flex justify-between items-center">
         <span class="text-sm font-medium text-gray-500">
-          {{ goalData?.goalName ? `${goalData.goalName} 상환` : '대출 상환' }}
+          {{ formattedGoalTitle }}
         </span>
         <span :class="['text-xs font-semibold px-2 py-0.5 rounded-full', paceBadge.style]">
           {{ paceBadge.label }}
@@ -116,7 +116,7 @@ const props = defineProps({
   goalData: {
     type: Object,
     default: () => ({
-      goalName: '대출',
+      goalName: '대출 상환',
       goalAmount: 10000000,
       currentAmount: 0,
       progressRate: 0,
@@ -143,6 +143,28 @@ function formatCurrency(value) {
 
   return value.toLocaleString()
 }
+
+// 목표 이름과 유형에 따라 카드 3의 제목을 동적으로 결정
+const formattedGoalTitle = computed(() => {
+  const goalName = props.goalData?.goalName
+  const goalType = props.goalData?.goalType
+
+  // 목표 이름이 설정되지 않은 경우 기본값
+  if (!goalName) return '대출 상환'
+
+  // '학자금 대출 상환'이거나, 목표 유형이 대출(LOAN)인 경우, 또는 이미 '대출'/'상환' 문구가 포함된 경우
+  if (
+    goalType === 'LOAN' ||
+    goalName.includes('학자금') ||
+    goalName.includes('대출') ||
+    goalName.includes('상환')
+  ) {
+    return goalName // 자기 명칭 그대로 출력 (예: "학자금 대출 상환")
+  }
+
+  // 그 외 카테고리 (비상금, 독립자금, 결혼자금 등)
+  return `${goalName} 대출 상환`
+})
 
 // paceStatus에 따른 배지 스타일 매핑 (ON_TRACK, AHEAD, BEHIND)
 const paceBadge = computed(() => {
