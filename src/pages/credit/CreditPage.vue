@@ -1,38 +1,57 @@
+<!-- CreditPage.vue -->
 <template>
-  <CreditDashboard :credit-summary="creditSummary" :score-percentile="scorePercentile" />
+  <div>
+    <!-- 메인 대시보드 -->
+    <CreditDashboard
+      :current-score="currentScore"
+      :history-list="historyList"
+      :goal-data="currentGoal"
+      @open-history="openHistoryModal"
+    />
+
+    <!-- 변동 이력 모달 -->
+    <CreditHistoryModal
+      :is-open="isHistoryModalOpen"
+      :history-list="historyList"
+      :total-elements="totalElements"
+      :is-loading="isLoading"
+      @close="closeHistoryModal"
+    />
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { CreditDashboard } from '@/features/credit'
-import { useGoalStore } from '@/features/goal'
+import CreditDashboard from '@/features/credit/components/CreditDashboard.vue'
+import CreditHistoryModal from '@/features/credit/components/CreditHistoryModal.vue'
+import { useCreditStore } from '@/features/credit/store/credit.store'
+import { useGoalStore } from '@/features/goal/store/goal.store'
 
+const creditStore = useCreditStore()
 const goalStore = useGoalStore()
-const { goals, selectedGoalId } = storeToRefs(goalStore)
 
-// 서버/스토어 데이터 Mock 상태
-const creditSummary = ref({
-  score: 896,
-  monthlyChange: 15,
-})
-const scorePercentile = ref(20)
+const { currentScore, historyList, totalElements, isLoading } = storeToRefs(creditStore)
+const { currentGoal } = storeToRefs(goalStore)
+
+const isHistoryModalOpen = ref(false)
+
+function openHistoryModal() {
+  isHistoryModalOpen.value = true
+}
+
+function closeHistoryModal() {
+  isHistoryModalOpen.value = false
+}
 
 onMounted(async () => {
+  // 1. 신용점수 및 변동 이력 조회
+  await creditStore.fetchCreditData()
+
+  // 2. 등록된 목표(대출 상환 등) 조회 및 대시보드 데이터 호출
   await goalStore.fetchGoals()
-
-  if (goals.value.length === 0) return
-
-  const numericGoalId = Number(selectedGoalId.value)
-  const hasSelectedGoal =
-    Number.isInteger(numericGoalId) &&
-    goals.value.some((goal) => Number(goal.goalId) === numericGoalId)
-
-  if (hasSelectedGoal) return
-
-  const firstGoalId = Number(goals.value[0]?.goalId)
-  if (Number.isInteger(firstGoalId) && firstGoalId > 0) {
-    goalStore.selectGoal(firstGoalId)
+  if (goalStore.selectedGoalId) {
+    await goalStore.fetchDashboardData(goalStore.selectedGoalId)
   }
 })
 </script>

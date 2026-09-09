@@ -161,6 +161,14 @@
           </RouterLink>
 
           <RouterLink
+            :to="{ name: ROUTE_NAMES.CREDIT }"
+            class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
+          >
+            <NavIcon name="credit" />
+            <span>신용 관리</span>
+          </RouterLink>
+
+          <RouterLink
             :to="{ name: ROUTE_NAMES.COACH }"
             class="flex items-center gap-3 rounded-xl px-1 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
           >

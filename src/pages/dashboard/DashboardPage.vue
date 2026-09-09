@@ -64,6 +64,8 @@
             :remain-months="goalStore.currentGoal.period.remainMonths"
             :daily-available-money="goalStore.dailyAvailableMoney"
             :monthly-available-money="goalStore.monthlyAvailableMoney"
+            :credit-score="creditStore.currentScore"
+            :updated-at="creditStore.updatedAt"
             :pacemaker="displayedPacemaker"
             :is-toggling="pacemakerStore.isToggling"
             :pacemaker-error="hasPacemakerDataError"
@@ -74,6 +76,7 @@
             @resume="openResumeConfirm"
             @open-today="handleOpenTodayAvailableMoneyModal"
             @open-month="handleOpenMonthlyAvailableMoneyModal"
+            @open-credit="handleOpenCredit"
             @view-roadmap="scrollToRoadmapSection"
           />
         </div>
@@ -222,6 +225,7 @@ import DashboardIcon from '@/pages/dashboard/components/DashboardIcon.vue'
 import { useModal } from '@/shared/composables/useModal'
 import { ROUTE_NAMES } from '@/shared/constants/routes'
 import { PACE_STATE, derivePaceState } from '@/features/roadmap/constants/pace-state.constants'
+import { useCreditStore } from '@/features/credit/store/credit.store' // 💡 creditStore 경로에 맞춰 import
 
 const route = useRoute()
 const router = useRouter()
@@ -229,6 +233,8 @@ const goalStore = useGoalStore()
 const roadmapStore = useRoadmapStore()
 const pacemakerStore = usePacemakerStore()
 const collectionStore = useCollectionStore()
+const creditStore = useCreditStore()
+
 const isPageLoading = ref(true)
 const { isOpen: isPacemakerModalOpen, open: openPacemakerModal } = useModal()
 const { isOpen: isPacemakerAssistFlowOpen, open: openPacemakerAssistFlow } = useModal()
@@ -350,6 +356,10 @@ watch(
 
 function handleOpenMonthlyAvailableMoneyModal() {
   isMonthlyAvailableMoneyModalOpen.value = true
+}
+
+function handleOpenCredit() {
+  router.push({ name: ROUTE_NAMES.CREDIT })
 }
 
 function handleOpenLinkedAssets() {
@@ -542,6 +552,9 @@ async function loadPacemakerData() {
 // 그 순간 버튼을 누르면 잘못된 설정 모달이 열릴 수 있다.
 onMounted(async () => {
   try {
+    // 💡 목표 정보 및 페이스메이커와 함께 신용점수 데이터도 함께 조회합니다.
+    creditStore.fetchCreditData().catch(() => undefined)
+
     await goalStore.fetchGoals()
 
     const goalId = route.params.goalId ? Number(route.params.goalId) : goalStore.selectedGoalId

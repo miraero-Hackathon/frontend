@@ -70,7 +70,8 @@
             </span>
             <span class="size-1 rounded-full bg-slate-300" />
             <span v-if="!disabled" class="font-normal text-slate-500">
-              예상 도착일 <strong class="font-semibold text-slate-700">{{ formattedEndDate }}</strong>
+              예상 도착일
+              <strong class="font-semibold text-slate-700">{{ formattedEndDate }}</strong>
             </span>
             <span v-else class="font-normal text-slate-400">
               자동이체 해제됨 · 저금통 적립 일시정지
@@ -175,6 +176,43 @@
               {{ formatWon(monthlyAvailableMoney.availableMoney) }}
             </strong>
           </button>
+          <!-- 3. 내 신용점수 (신규 추가) -->
+          <!-- 3. 내 신용점수 (수정 버전) -->
+          <button
+            type="button"
+            class="group relative col-span-2 mt-1 flex items-center justify-between rounded-xl bg-white/60 p-2.5 transition-all duration-200 hover:bg-white hover:shadow-sm active:scale-[0.99] disabled:pointer-events-none disabled:opacity-45 cursor-pointer select-none border border-slate-100"
+            :disabled="disabled"
+            @click="$emit('open-credit')"
+          >
+            <div class="flex items-center gap-2">
+              <!-- 좌측 라벨 + 기준일 뱃지 -->
+              <span
+                class="text-xs font-semibold text-slate-600 group-hover:text-primary transition-colors"
+              >
+                내 신용점수
+              </span>
+              <span
+                v-if="creditScore && updatedAt"
+                class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-400"
+              >
+                {{ formatUpdatedDate(updatedAt) }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <!-- 점수 출력 -->
+              <strong
+                class="text-sm sm:text-base font-bold tabular-nums text-[#0a192f] group-hover:text-primary transition-colors"
+              >
+                {{ creditScore ? `${creditScore}` : '—' }}
+              </strong>
+              <span v-if="creditScore" class="text-xs font-normal text-slate-400">점</span>
+              <!-- 우측 이동 화살표 추가로 클릭 가능 영역 강조 -->
+              <span class="ml-0.5 text-xs text-slate-300 group-hover:text-primary transition-colors"
+                >›</span
+              >
+            </div>
+          </button>
         </div>
 
         <div class="flex flex-1 flex-col justify-between gap-2.5 pt-2.5">
@@ -251,8 +289,8 @@
                       pacemakerError
                         ? '페이스메이커 정보를 불러오지 못했어요'
                         : pacemaker?.enabled
-                        ? `이번달 +${formatWon(pacemaker.monthlySecuredAmount)} 자동 확보`
-                        : '하루 여유자금으로 자동 저축'
+                          ? `이번달 +${formatWon(pacemaker.monthlySecuredAmount)} 자동 확보`
+                          : '하루 여유자금으로 자동 저축'
                     }}
                   </span>
                 </span>
@@ -298,6 +336,8 @@ const props = defineProps({
   remainMonths: { type: Number, default: 0 },
   dailyAvailableMoney: { type: Object, default: null },
   monthlyAvailableMoney: { type: Object, default: null },
+  creditScore: { type: [Number, String], default: null },
+  updatedAt: { type: String, default: '' },
   pacemaker: { type: Object, default: null },
   isToggling: { type: Boolean, default: false },
   pacemakerError: { type: Boolean, default: false },
@@ -320,15 +360,25 @@ defineEmits([
   'resume',
   'open-today',
   'open-month',
+  'open-credit',
   'toggle',
   'view-roadmap',
 ])
 
 // 페이스 상태(시작 전/적정/앞섬/뒤처짐)별 CTA 문구 — 항상 서비스 메인 블루 톤 유지
 const PACE_CTA_CONTENT = {
-  [PACE_STATE.NOT_STARTED]: { title: '첫 저축 시작하기', description: '페이스메이커가 도와드릴게요' },
-  [PACE_STATE.ON_TRACK]: { title: '지금 페이스 유지하기', description: '이번 달 목표 금액을 자동으로 모아요' },
-  [PACE_STATE.AHEAD]: { title: '더 빨리 달성하는 방법 보기', description: '페이스메이커가 알아서 모아줄게요' },
+  [PACE_STATE.NOT_STARTED]: {
+    title: '첫 저축 시작하기',
+    description: '페이스메이커가 도와드릴게요',
+  },
+  [PACE_STATE.ON_TRACK]: {
+    title: '지금 페이스 유지하기',
+    description: '이번 달 목표 금액을 자동으로 모아요',
+  },
+  [PACE_STATE.AHEAD]: {
+    title: '더 빨리 달성하는 방법 보기',
+    description: '페이스메이커가 알아서 모아줄게요',
+  },
   [PACE_STATE.BEHIND]: { title: '목표 페이스 따라잡기', description: '페이스메이커가 도와줄게요' },
 }
 
@@ -367,5 +417,16 @@ function formatManwon(amount) {
 
 function formatWon(amount) {
   return `${Number(amount ?? 0).toLocaleString('ko-KR')}원`
+}
+
+function formatUpdatedDate(dateString) {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${year}.${month}.${day} 기준` // 예: "9.9 기준"
 }
 </script>

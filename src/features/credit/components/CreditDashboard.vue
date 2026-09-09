@@ -1,148 +1,276 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-    <!-- 상단 3개 카드 영역 -->
-    <CreditSummaryCards
-      :credit-score="creditSummary.score"
-      :score-percentile="scorePercentile"
-      :monthly-change="creditSummary.monthlyChange"
-      :target-score="950"
-      @open-history="handleOpenHistory"
-    />
+  <!-- 반응형 컨테이너: 데스크톱 max-w-6xl, 모바일 px-3.5 -->
+  <div
+    class="page-container py-4 sm:py-8 space-y-6 sm:space-y-8 max-w-6xl mx-auto px-3.5 sm:px-6 bg-slate-50/50 min-h-screen"
+  >
+    <!-- 1. 상단 Summary Cards 영역 -->
+    <section>
+      <CreditSummaryCards
+        :current-score="currentScore"
+        :score-change-highlight-text="scoreChangeHighlightText"
+        :score-change-description="scoreChangeDescription"
+        :score-change-tone="scoreChangeTone"
+        :target-score="900"
+        :goal-data="goalData"
+        @open-history="$emit('open-history')"
+      />
+    </section>
 
-    <!-- 하단 3개 탭 시뮬레이터 / 가이드 영역 -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <!-- 탭 선택 헤더 -->
-      <div class="flex border-b border-gray-100 bg-gray-50/50 p-1.5">
+    <!-- 2. 신용 관리 시뮬레이터 & 정보 영역 -->
+    <section
+      class="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-8 space-y-5 sm:space-y-6"
+    >
+      <!-- 섹션 헤더 -->
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4 sm:pb-5"
+      >
+        <div>
+          <h3 class="text-base sm:text-xl font-bold text-slate-900 tracking-tight">
+            신용점수 올리기 시뮬레이터
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
+            점수대별 우대 혜택과 맞춤형 가감점 요인을 확인해보세요.
+          </p>
+        </div>
+      </div>
+
+      <!-- 세그먼트 컨트롤 스타일 탭 (Toss / iOS 스타일) -->
+      <div class="bg-slate-100/80 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl flex gap-1">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           @click="activeTab = tab.id"
           :class="[
-            'flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-150',
+            'flex-1 py-2.5 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all duration-200 ease-out select-none text-center truncate',
             activeTab === tab.id
-              ? 'bg-white text-blue-600 shadow-sm border border-gray-200/50'
-              : 'text-gray-400 hover:text-gray-600',
+              ? 'bg-white text-primary shadow-xs ring-1 ring-black/5'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-white/50',
           ]"
         >
-          {{ tab.label }}
+          <!-- 반응형 라벨: 모바일 축약어 / 데스크톱 전체 명칭 -->
+          <span class="inline sm:hidden">{{ getShortTabLabel(tab.id) }}</span>
+          <span class="hidden sm:inline">{{ tab.label }}</span>
         </button>
       </div>
 
-      <!-- 탭 컨텐츠 -->
-      <div class="p-6">
-        <!-- TAB 1: 신용 점수대별 금융 혜택 -->
-        <div v-if="activeTab === 'BENEFITS'" class="space-y-4">
-          <p class="text-xs text-gray-400">점수 구간별 대출 금리 및 금융 우대 혜택 현황입니다.</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div
-              v-for="item in benefitRanges"
-              :key="item.id"
-              :class="[
-                'p-4 rounded-xl border transition-all',
-                item.isUserRange
-                  ? 'border-blue-500 bg-blue-50/20 shadow-sm'
-                  : 'border-gray-100 bg-white',
-              ]"
-            >
-              <div class="flex justify-between items-center mb-3">
-                <span class="font-bold text-gray-900">{{ item.label }}</span>
+      <!-- 탭 1: 점수대별 금융 혜택 -->
+      <div
+        v-if="activeTab === 'BENEFITS'"
+        class="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 pt-1 sm:pt-2"
+      >
+        <div
+          v-for="item in benefitRanges"
+          :key="item.id"
+          :class="[
+            'p-4 sm:p-6 rounded-2xl border transition-all space-y-3.5 sm:space-y-4',
+            item.isUserRange
+              ? 'border-primary/50 bg-gradient-to-br from-blue-50/50 via-white to-white ring-2 ring-primary/20 shadow-md'
+              : 'border-slate-100 bg-white hover:border-slate-200',
+          ]"
+        >
+          <!-- 카드 타이틀 영역 -->
+          <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs font-bold text-primary bg-blue-50 px-2.5 py-0.5 rounded-md">
+                  {{ item.tier }}
+                </span>
                 <span
                   v-if="item.isUserRange"
-                  class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded font-medium"
+                  class="text-[11px] font-bold bg-primary text-white px-2.5 py-0.5 rounded-full"
                 >
                   내 구간
                 </span>
               </div>
-              <div class="text-xs text-gray-600 space-y-1.5">
-                <div>
-                  • 평균 대출 금리: <span class="font-bold text-gray-800">{{ item.avgRate }}</span>
-                </div>
-                <div>• DSR 한도: {{ item.dsrLimit }}</div>
-                <div>• 카드 발급: {{ item.cardIssuance }}</div>
-              </div>
+              <h4 class="text-base sm:text-lg font-bold text-slate-900 mt-1.5">{{ item.label }}</h4>
+              <p v-if="item.niceRange" class="text-xs text-slate-400 mt-0.5">
+                {{ item.niceRange }}
+              </p>
             </div>
           </div>
-        </div>
 
-        <!-- TAB 2: 가점 항목 -->
-        <div v-if="activeTab === 'POSITIVE'" class="space-y-3">
-          <p class="text-xs text-gray-400">신용 평가 시 긍정적 반영 비율 및 중요 요소입니다.</p>
+          <!-- 핵심 요약 지표 -->
           <div
-            v-for="item in positiveItems"
-            :key="item.id"
-            class="p-4 border border-gray-100 rounded-xl hover:border-blue-200 transition-all space-y-2"
+            class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100/60"
           >
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-gray-900 text-sm">{{ item.name }}</span>
-                <span class="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded">
-                  {{ item.actionText }}
-                </span>
-              </div>
-              <span class="text-xs text-amber-500 font-bold">영향도 {{ item.impactStars }}</span>
+            <div>
+              <span class="text-slate-400 block text-[11px] sm:text-xs mb-0.5">평균 대출 금리</span>
+              <strong class="text-slate-900 text-xs sm:text-sm font-bold block">{{
+                item.avgRate
+              }}</strong>
             </div>
-            <p class="text-xs text-gray-500">{{ item.description }}</p>
-            <div class="flex gap-4 text-xs text-gray-400 bg-gray-50 p-2 rounded-lg">
-              <span
-                >NICE 비중: <strong class="text-gray-700">{{ item.niceWeight }}</strong></span
+            <div>
+              <span class="text-slate-400 block text-[11px] sm:text-xs mb-0.5">신용카드 발급</span>
+              <strong
+                class="text-slate-900 text-xs sm:text-sm font-semibold block leading-tight break-keep"
               >
-              <span
-                >KCB 비중: <strong class="text-gray-700">{{ item.kcbWeight }}</strong></span
-              >
+                <span class="inline sm:hidden">{{
+                  formatCardIssuanceMobile(item.cardIssuance)
+                }}</span>
+                <span class="hidden sm:inline">{{ item.cardIssuance }}</span>
+              </strong>
             </div>
           </div>
-        </div>
 
-        <!-- TAB 3: 감점 항목 -->
-        <div v-if="activeTab === 'NEGATIVE'" class="space-y-3">
-          <p class="text-xs text-gray-400">
-            신용 점수 하락에 직접적인 영향을 주는 주요 요인입니다.
-          </p>
-          <div
-            v-for="item in negativeItems"
-            :key="item.id"
-            class="p-4 border border-rose-100 bg-rose-50/10 rounded-xl space-y-2"
-          >
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-rose-900 text-sm">{{ item.name }}</span>
-              <span class="text-xs text-rose-500 font-bold">위험도 {{ item.riskLevel }}</span>
+          <!-- 혜택 & 제약 상세 -->
+          <div class="space-y-2.5 text-xs sm:text-sm pt-1">
+            <div>
+              <span
+                class="font-bold text-emerald-600 text-xs sm:text-sm flex items-center gap-1 mb-1"
+              >
+                <span>✓</span> 주요 혜택 & 특징
+              </span>
+              <ul class="space-y-1 text-slate-600 pl-0.5">
+                <li
+                  v-for="(b, idx) in item.benefits"
+                  :key="idx"
+                  class="flex items-start gap-1.5 leading-relaxed text-xs sm:text-sm"
+                >
+                  <span class="text-emerald-500 font-bold shrink-0">•</span>
+                  <span class="flex-1">{{ b }}</span>
+                </li>
+              </ul>
             </div>
-            <p class="text-xs text-gray-600">{{ item.description }}</p>
-            <div class="text-xs text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-lg inline-block">
-              💡 {{ item.tip }}
+
+            <div class="pt-2 border-t border-slate-100">
+              <span class="font-bold text-rose-500 text-xs sm:text-sm flex items-center gap-1 mb-1">
+                <span>!</span> 유의사항 & 제약
+              </span>
+              <ul class="space-y-1 text-slate-500 pl-0.5">
+                <li
+                  v-for="(d, idx) in item.drawbacks"
+                  :key="idx"
+                  class="flex items-start gap-1.5 leading-relaxed text-xs sm:text-sm"
+                >
+                  <span class="text-rose-400 font-bold shrink-0">•</span>
+                  <span class="flex-1">{{ d }}</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- 탭 2: 신용 가점 항목 -->
+      <div v-if="activeTab === 'POSITIVE'" class="space-y-3 pt-1 sm:pt-2">
+        <div
+          v-for="item in positiveItems"
+          :key="item.id"
+          class="p-4 sm:p-5 border border-blue-100 rounded-2xl bg-blue-50/50 hover:border-blue-200 transition-all duration-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
+        >
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-slate-900 text-sm sm:text-base">{{ item.name }}</span>
+
+              <!-- 가점 점수 뱃지 (파란색) -->
+              <span
+                class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-md shrink-0"
+              >
+                {{ item.actionText }}
+              </span>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+              {{ item.description }}
+            </p>
+          </div>
+
+          <!-- 평가 반영 비중 영역 (2줄 배치) -->
+          <div
+            class="border-t md:border-t-0 pt-2.5 md:pt-0 border-blue-100 shrink-0 text-left md:text-right"
+          >
+            <div class="text-[11px] sm:text-xs text-slate-400 mb-0.5">평가 반영 비중</div>
+
+            <div class="text-xs sm:text-sm font-medium text-slate-700 leading-tight space-y-0.5">
+              <div>NICE {{ item.niceWeight }}</div>
+              <div>KCB {{ item.kcbWeight }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 탭 3: 신용 감점 유의사항 -->
+      <div v-if="activeTab === 'NEGATIVE'" class="space-y-3 pt-1 sm:pt-2">
+        <div
+          v-for="item in negativeItems"
+          :key="item.id"
+          class="p-4 sm:p-5 border border-rose-100 bg-rose-50/20 rounded-2xl space-y-2.5 transition-all duration-200"
+        >
+          <div class="flex justify-between items-center flex-wrap gap-2">
+            <span class="font-bold text-rose-950 text-sm sm:text-base flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+              {{ item.name }}
+            </span>
+
+            <!-- 감점 점수 뱃지 (빨간색) -->
+            <span
+              v-if="item.actionText"
+              class="text-xs font-bold text-rose-600 bg-rose-100/80 border border-rose-200 px-2.5 py-0.5 rounded-md"
+            >
+              {{ item.actionText }}
+            </span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            {{ item.description }}
+          </p>
+
+          <div
+            class="text-xs sm:text-sm font-medium text-rose-800 bg-white/90 border border-rose-100 p-3 rounded-xl flex items-start sm:items-center gap-2 shadow-2xs"
+          >
+            <span class="text-sm shrink-0">💡</span>
+            <span class="leading-relaxed">{{ item.tip }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { toRef } from 'vue'
-import { useCreditSimulator, useCreditSummary } from '../composables/useCreditSimulator'
+import { computed } from 'vue'
 import CreditSummaryCards from './CreditSummaryCards.vue'
+import { useCreditSimulator, useCreditSummary } from '../composables/useCreditSimulator'
 
 const props = defineProps({
-  creditSummary: {
-    type: Object,
-    default: () => ({ score: 896, monthlyChange: 15 }),
-  },
-  scorePercentile: {
-    type: Number,
-    default: 20,
-  },
+  currentScore: { type: Number, required: true },
+  historyList: { type: Array, default: () => [] },
+  goalData: { type: Object, default: () => null },
 })
 
-const creditSummaryRef = toRef(props, 'creditSummary')
+defineEmits(['open-history'])
 
-const { currentScore, scoreChangeHighlightText, scoreChangeDescription, scoreChangeTone } =
-  useCreditSummary(creditSummaryRef)
+const currentScoreRef = computed(() => props.currentScore)
+const historyListRef = computed(() => props.historyList)
+
+const { scoreChangeHighlightText, scoreChangeDescription, scoreChangeTone } = useCreditSummary(
+  currentScoreRef,
+  historyListRef
+)
 
 const { activeTab, tabs, benefitRanges, positiveItems, negativeItems } =
-  useCreditSimulator(currentScore)
+  useCreditSimulator(currentScoreRef)
 
-function handleOpenHistory() {
-  console.log('신용점수 이력 모달 열기')
+const getShortTabLabel = (tabId) => {
+  switch (tabId) {
+    case 'BENEFITS':
+      return '금융 혜택'
+    case 'POSITIVE':
+      return '가점 요인'
+    case 'NEGATIVE':
+      return '감점 주의'
+    default:
+      return ''
+  }
+}
+
+const formatCardIssuanceMobile = (text) => {
+  if (!text) return '-'
+  if (text.includes('무조건 승인') || text.includes('최고 한도')) return '최고한도 발급 승인'
+  if (text.includes('정상 발급')) return '정상 발급 가능'
+  if (text.includes('소득 증빙 필수')) return '조건부 발급 (소득증빙)'
+  if (text.includes('최소기준') || text.includes('거절 가능성')) return '발급 심사 주의'
+  if (text.includes('불가')) return '발급 불가'
+  return text
 }
 </script>
